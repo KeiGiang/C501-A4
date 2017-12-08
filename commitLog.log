@@ -1,0 +1,48 @@
+commit ff983c0f0c71de0b0aedf504ff6d74bb887a51f4
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Fri Dec 8 15:53:17 2017 -0700
+
+    spacing fixes
+
+commit 506c5922ca4cca09b8badd4ee86b5fa941bc57bf
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Fri Dec 8 13:39:09 2017 -0700
+
+    fft convolution complete. added clock to baseline and fft
+
+commit 1baba385593df89c42feeb0e298dd3afea16f34e
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Fri Dec 8 09:04:06 2017 -0700
+
+    added a final check to signal before write
+
+commit 8612d41ac12731f5d0d975a1cc83c25a675ae4f0
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Fri Dec 8 08:44:06 2017 -0700
+
+    update makefile
+    :
+
+commit de891ca722adcaf7f09782f8461b15ac3f97bf8f
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Fri Dec 8 08:43:15 2017 -0700
+
+    rename file
+
+commit 4e1c3ae98b9920862b620f2b87f83822ceb8f18c
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Fri Dec 8 08:42:15 2017 -0700
+
+    finish baseline program. update makefile and gitignore
+
+commit 497a4f9576c9003dde91f24fc2a084729b2e9d88
+Author: KeiGiang <giangkvn@gmail.com>
+Date:   Wed Dec 6 04:30:40 2017 -0700
+
+    initial commit
+
+commit 89813a699a7438b9d4498083ed8c50b85cc67c61
+Author: KeiGiang <11278543+KeiGiang@users.noreply.github.com>
+Date:   Tue Dec 5 21:11:47 2017 -0700
+
+    Initial commit
