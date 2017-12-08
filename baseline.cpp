@@ -220,8 +220,16 @@ void writeFile(char* toOpen, float data[], int length)
     fwrite(&Subchunk2Size, sizeof(long), 1, outputFile);
 
     short sample;
+    float temp;
     for (int i = 0; i < length; i++){
-        sample = (short)(data[i] * 32767.0);
+        temp = data[i];
+        if (data[i] < -1.0)
+            temp = -1.0;
+
+        else if (data[i] > 1.0)
+            temp = 1.0;
+
+        sample = (short)(temp * 32767.0);
         fwrite(&sample, sizeof(short), 1, outputFile);
         // printf("%d\n", sample);
     }
@@ -270,10 +278,10 @@ int main(int argc, char* argv[]) {
     convolve(file1Signal, file1Size, file2Signal, file2Size, outputFileSignal, outputFileSize);
     printf("done\n");
 
-    for(int i = 0; i < outputFileSize; i++)
-    {
-        outputFileSignal[i] = outputFileSignal[i] * 0.8;
-    }
+    // for(int i = 0; i < outputFileSize; i++)
+    // {
+    //     outputFileSignal[i] = outputFileSignal[i] * 0.8;
+    // }
 
     char* outputFile = argv[3];
     writeFile(outputFile, outputFileSignal, outputFileSize);
