@@ -47,42 +47,48 @@ void four1(double data[], int nn, int isign)
     n = nn << 1;
     j = 1;
 
-    for (i = 1; i < n; i += 2) {
-	if (j > i) {
-	    SWAP(data[j], data[i]);
-	    SWAP(data[j+1], data[i+1]);
-	}
-	m = nn;
-	while (m >= 2 && j > m) {
-	    j -= m;
-	    m >>= 1;
-	}
-	j += m;
+    for (i = 1; i < n; i += 2)
+    {
+    	if (j > i)
+        {
+    	    SWAP(data[j], data[i]);
+    	    SWAP(data[j+1], data[i+1]);
+    	}
+    	m = nn;
+    	while (m >= 2 && j > m)
+        {
+    	    j -= m;
+    	    m >>= 1;
+        }
+        j += m;
     }
 
     mmax = 2;
-    while (n > mmax) {
-	istep = mmax << 1;
-	theta = isign * (6.28318530717959 / mmax);
-	wtemp = sin(0.5 * theta);
-	wpr = -2.0 * wtemp * wtemp;
-	wpi = sin(theta);
-	wr = 1.0;
-	wi = 0.0;
-	for (m = 1; m < mmax; m += 2) {
-	    for (i = m; i <= n; i += istep) {
-		j = i + mmax;
-		tempr = wr * data[j] - wi * data[j+1];
-		tempi = wr * data[j+1] + wi * data[j];
-		data[j] = data[i] - tempr;
-		data[j+1] = data[i+1] - tempi;
-		data[i] += tempr;
-		data[i+1] += tempi;
-	    }
-	    wr = (wtemp = wr) * wpr - wi * wpi + wr;
-	    wi = wi * wpr + wtemp * wpi + wi;
-	}
-	mmax = istep;
+    while (n > mmax)
+    {
+    	istep = mmax << 1;
+    	theta = isign * (6.28318530717959 / mmax);
+    	wtemp = sin(0.5 * theta);
+    	wpr = -2.0 * wtemp * wtemp;
+    	wpi = sin(theta);
+    	wr = 1.0;
+    	wi = 0.0;
+    	for (m = 1; m < mmax; m += 2)
+        {
+    	    for (i = m; i <= n; i += istep)
+            {
+        		j = i + mmax;
+        		tempr = wr * data[j] - wi * data[j+1];
+        		tempi = wr * data[j+1] + wi * data[j];
+        		data[j] = data[i] - tempr;
+        		data[j+1] = data[i+1] - tempi;
+        		data[i] += tempr;
+        		data[i+1] += tempi;
+    	    }
+    	    wr = (wtemp = wr) * wpr - wi * wpi + wr;
+    	    wi = wi * wpr + wtemp * wpi + wi;
+    	}
+    	mmax = istep;
     }
 }
 
@@ -174,11 +180,11 @@ float* readFile(char* toRead, int *wavSize)
 
     fread(wavHeader.ChunkID, sizeof(wavHeader.ChunkID), 1, inputFile);
     fread(buffer4, sizeof(buffer4), 1, inputFile);
-    wavHeader.ChunkSize = buffer4[0] | (buffer4[1]<<8) | (buffer4[2]<<16) | (buffer4[3]<<24);
+    wavHeader.ChunkSize = buffer4[0] | (buffer4[1] << 8) | (buffer4[2] << 16) | (buffer4[3] << 24);
     fread(wavHeader.Format, sizeof(wavHeader.Format), 1, inputFile);
     fread(wavHeader.Subchunk1ID, sizeof(wavHeader.Subchunk1ID), 1, inputFile);
     fread(buffer4, sizeof(buffer4), 1, inputFile);
-    wavHeader.Subchunk1Size = buffer4[0] | (buffer4[1]<<8) | (buffer4[2]<<16) | (buffer4[3]<<24);
+    wavHeader.Subchunk1Size = buffer4[0] | (buffer4[1] << 8) | (buffer4[2] << 16) | (buffer4[3] << 24);
     fread(buffer2, sizeof(buffer2), 1, inputFile);
     wavHeader.AudioFormat = buffer2[0] | (buffer2[1] << 8);
     char format_name[10] = "";
