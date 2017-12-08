@@ -7,3 +7,5 @@ base:
 
 clean:
 	rm -rf *.out
+	rm -rf *.txt
+	rm -rf out.wav
