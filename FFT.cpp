@@ -3,9 +3,10 @@
 #include <iostream>
 #include <fstream>
 #include <stdlib.h>
-#include <ctime>
+#include <math.h>
 
 using namespace std;
+#define SWAP(a,b)  tempr=(a);(a)=(b);(b)=tempr
 // using std::cout;
 // using std::endl;
 
@@ -36,6 +37,55 @@ bool ends_with(string const & value, string const & ending)
     return equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+// four1 is from Professor Manzara's handout
+void four1(double data[], int nn, int isign)
+{
+    unsigned long n, mmax, m, j, istep, i;
+    double wtemp, wr, wpr, wpi, wi, theta;
+    double tempr, tempi;
+
+    n = nn << 1;
+    j = 1;
+
+    for (i = 1; i < n; i += 2) {
+	if (j > i) {
+	    SWAP(data[j], data[i]);
+	    SWAP(data[j+1], data[i+1]);
+	}
+	m = nn;
+	while (m >= 2 && j > m) {
+	    j -= m;
+	    m >>= 1;
+	}
+	j += m;
+    }
+
+    mmax = 2;
+    while (n > mmax) {
+	istep = mmax << 1;
+	theta = isign * (6.28318530717959 / mmax);
+	wtemp = sin(0.5 * theta);
+	wpr = -2.0 * wtemp * wtemp;
+	wpi = sin(theta);
+	wr = 1.0;
+	wi = 0.0;
+	for (m = 1; m < mmax; m += 2) {
+	    for (i = m; i <= n; i += istep) {
+		j = i + mmax;
+		tempr = wr * data[j] - wi * data[j+1];
+		tempi = wr * data[j+1] + wi * data[j];
+		data[j] = data[i] - tempr;
+		data[j+1] = data[i+1] - tempi;
+		data[i] += tempr;
+		data[i+1] += tempi;
+	    }
+	    wr = (wtemp = wr) * wpr - wi * wpi + wr;
+	    wi = wi * wpr + wtemp * wpi + wi;
+	}
+	mmax = istep;
+    }
+}
+
 // Algorithm taken from Professor Manzara's handout
 // x[] = signal to be convolved
 // N = x.numSamples()
@@ -45,26 +95,66 @@ bool ends_with(string const & value, string const & ending)
 // P = y.numSamples(), must =  N + M - 1
 void convolve(float x[], int N, float h[], int M, float y[], int P)
 {
-    // int check = N + M - 1;
     printf("Convolving...");
-    if (P != (N + M - 1))
-    {
-        printf("Output signal vector is the wrong size\n");
-        printf("It is %-d, but should be %-d\n", P, (N + M - 1));
-        printf("Aborting convolution\n");
-        return;
-    }
-    int n, m;
-    for (n = 0; n < P; n++)
-        y[n] = 0.0;
+	int size = 2;
+	int longest;
 
-    /* outer loop: process each input value x[n] in turn */
-	for (n = 0; n < N; n++)
-	{
-		/* inner loop: process each x[n] with each sample of h[n] */
-		for (m = 0; m < M; m++)
-			y[n+m] += x[n] * h[m];
-	}
+	if (N > M)
+		longest=N;
+	else
+		longest=M;
+
+	while (size < longest)
+		size *= 2;
+
+    size *= 2;
+	double * array1 = new double[size];
+	double * array2 = new double[size];
+	double * finalArray = new double[size];
+
+    for (int i = 0; i < size; i++)
+    {
+        array1[i] = 0;
+        array2[i] = 0;
+        finalArray[i] = 0;
+    }
+
+	for (int i = 0; i < N; i++)
+		array1[i*2] = x[i];
+
+    // printf("Fuck\n");
+	for (int i = 0; i < M; i++)
+		array2[i*2] = h[i];
+
+	four1(array1-1, (size / 2), 1);
+	four1(array2-1, (size / 2), 1);
+
+    for (int i = 0; i < size; i += 2)
+    {
+        finalArray[i] = (array1[i] * array2[i]) - (array1[i+1] * array2[i+1]);
+        finalArray[i+1] = (array1[i+1] * array2[i]) + (array1[i] * array2[i+1]);
+    }
+
+    four1((finalArray - 1), (size / 2), -1);
+
+    float max;
+    for (int i = 0; i < P; i++)
+    {
+        y[i] = finalArray[i*2];
+
+        if (abs(y[i]) > max){
+            max = y[i];
+        }
+    }
+
+    for (int i = 0; i < P; i++)
+    {
+        y[i] /= max;
+        if(y[i] < -1.0){
+            y[i] = (-1.0);
+        }
+    }
+
 }
 
 unsigned char buffer4[4];
@@ -91,9 +181,9 @@ float* readFile(char* toRead, int *wavSize)
     wavHeader.Subchunk1Size = buffer4[0] | (buffer4[1]<<8) | (buffer4[2]<<16) | (buffer4[3]<<24);
     fread(buffer2, sizeof(buffer2), 1, inputFile);
     wavHeader.AudioFormat = buffer2[0] | (buffer2[1] << 8);
-    // char format_name[10] = "";
-    // if (wavHeader.AudioFormat == 1)
-    //     strcpy(format_name, "PCM");
+    char format_name[10] = "";
+    if (wavHeader.AudioFormat == 1)
+        strcpy(format_name, "PCM");
     fread(buffer2, sizeof(buffer2), 1, inputFile);
     wavHeader.numChannel = buffer2[0] | (buffer2[1] << 8);
     fread(buffer4, sizeof(buffer4), 1, inputFile);
@@ -221,16 +311,8 @@ void writeFile(char* toOpen, float data[], int length)
     fwrite(&Subchunk2Size, sizeof(long), 1, outputFile);
 
     short sample;
-    float temp;
     for (int i = 0; i < length; i++){
-        temp = data[i];
-        if (data[i] < -1.0)
-            temp = -1.0;
-
-        else if (data[i] > 1.0)
-            temp = 1.0;
-
-        sample = (short)(temp * 32767.0);
+        sample = (short)(data[i] * 32767.0);
         fwrite(&sample, sizeof(short), 1, outputFile);
         // printf("%d\n", sample);
     }
@@ -281,13 +363,16 @@ int main(int argc, char* argv[])
     convolve(file1Signal, file1Size, file2Signal, file2Size, outputFileSignal, outputFileSize);
     printf("done\n");
 
-    // for(int i = 0; i < outputFileSize; i++)
-    // {
-    //     outputFileSignal[i] = outputFileSignal[i] * 0.8;
-    // }
+    for(int i = 0; i < outputFileSize; i++)
+    {
+        outputFileSignal[i] = outputFileSignal[i] * 0.8;
+    }
 
     char* outputFile = argv[3];
     writeFile(outputFile, outputFileSignal, outputFileSize);
+
+    // float test[0];
+    // convolve(test, 0, test, 0, test, 0);
 
     float time = (clock() - startTime) / (float) CLOCKS_PER_SEC;
     printf("This program took %f seconds\n", time);
