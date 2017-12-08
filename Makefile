@@ -1,9 +1,9 @@
 
 alt:
-	g++ convolve.cpp -o convolve.out
+	g++ baseline.cpp -o baseline.out
 
 base:
-	gcc convolve.cpp -lstdc++ -o convolve.out
+	gcc baseline.cpp -lstdc++ -o baseline.out
 
 clean:
 	rm -rf *.out
